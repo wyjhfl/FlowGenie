@@ -1,7 +1,6 @@
 """场景1：每日新闻摘要推送
-工作流：定时触发 → RSS/网页抓取新闻 → LLM 摘要 → 邮件/微信推送
+工作流：定时触发 → 网页抓取新闻 → LLM 摘要 → 微信推送
 """
-from core.tool_registry import get_tool
 
 
 def get_template() -> dict:
@@ -23,11 +22,12 @@ def get_template() -> dict:
             {
                 "id": "step_2",
                 "name": "抓取科技新闻",
-                "description": "从 RSS 源抓取最新科技新闻",
-                "tool": "rss_reader",
+                "description": "从新闻网站抓取最新科技资讯",
+                "tool": "web_scraper",
                 "params": {
-                    "feed_url": "https://feeds.feedburner.com/TechCrunch",
-                    "limit": 10,
+                    "url": "https://news.ycombinator.com",
+                    "selector": "a.titlelink",
+                    "fields": ["title", "href"],
                 },
             },
             {
@@ -36,7 +36,7 @@ def get_template() -> dict:
                 "description": "用 LLM 把抓取的新闻生成中文摘要",
                 "tool": "llm_summary",
                 "params": {
-                    "model": "deepseek-chat",
+                    "text": "{{step_2.items}}",
                     "max_length": 800,
                     "language": "zh",
                 },
@@ -44,10 +44,10 @@ def get_template() -> dict:
             {
                 "id": "step_4",
                 "name": "推送摘要",
-                "description": "把摘要推送到微信",
+                "description": "把摘要推送到企业微信",
                 "tool": "send_wechat",
                 "params": {
-                    "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_KEY",
+                    "content": "{{step_3.summary}}",
                     "msg_type": "markdown",
                 },
             },

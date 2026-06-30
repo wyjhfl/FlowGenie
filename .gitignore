@@ -9,6 +9,7 @@ env/
 ENV/
 env.bak/
 venv.bak/
+.venv/
 .env
 *.egg-info/
 dist/
@@ -23,6 +24,8 @@ pnpm-debug.log*
 
 # Vite
 frontend/dist/
+frontend/vite.config.ts.timestamp-*
+*.tsbuildinfo
 
 # IDE
 .vscode/
@@ -36,3 +39,15 @@ Thumbs.db
 
 # TRAE
 .trae/
+
+# SQLite database files
+backend/flowgenie.db*
+
+# Logs
+backend/logs/
+*.log
+
+# 测试覆盖率
+.coverage
+htmlcov/
+coverage/

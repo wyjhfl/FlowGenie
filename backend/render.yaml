@@ -5,12 +5,34 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
     envVars:
+      # ===== LLM(必填,在 Render 控制台填真实值)=====
       - key: LLM_API_KEY
         sync: false
       - key: LLM_BASE_URL
         value: https://apihub.agnes-ai.com/v1
       - key: LLM_MODEL
         value: agnes-2.0-flash
+      - key: LLM_AVAILABLE_MODELS
+        value: agnes-2.0-flash,agnes-2.0-pro,gpt-4o,claude-3-5-sonnet
+      - key: LLM_TIMEOUT
+        value: "60"
+      # ===== 前端域名(CORS 白名单,部署后替换为实际域名)=====
       - key: FRONTEND_URL
-        value: https://flowgenie.vercel.app
+        value: https://flowgenie.hfl.asia
+      # ===== 安全(部署时在 Render 控制台填随机值)=====
+      - key: FLOWGENIE_API_KEY
+        sync: false
+      - key: FLOWGENIE_ADMIN_TOKEN
+        sync: false
+      # ===== 性能调优 =====
+      - key: TOOL_TIMEOUT
+        value: "120"
+      - key: WORKFLOW_MAX_CONCURRENT
+        value: "5"
+      # ===== 日志 =====
+      - key: LOG_FORMAT_JSON
+        value: "1"
+      # ===== 凭证(可选,在应用凭证面板配置即可,此处留空)=====
+      # SMTP_HOST / WECHAT_WEBHOOK / GITHUB_TOKEN 等均通过凭证面板在线配置

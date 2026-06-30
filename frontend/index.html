@@ -2,8 +2,12 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      try { if (localStorage.getItem('flowgenie-theme') === 'light') document.documentElement.classList.add('light'); } catch (e) {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlowGenie - 自然语言驱动的 AI 智能工作流生成器</title>
+    <!-- Geist 字体通过 @fontsource 本地加载，见 main.tsx -->
   </head>
   <body>
     <div id="root"></div>

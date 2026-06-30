@@ -1,0 +1,186 @@
+{
+  "steps": [
+    {
+      "id": "step_1",
+      "name": "è¯»åè¯è®ºæä»¶",
+      "description": "è¯»ååå«äº§åè¯è®ºçææ¬æ JSON æä»¶",
+      "tool": "file_read",
+      "params": {
+        "path": "inputs/sample_reviews.txt",
+        "format": "text"
+      },
+      "tool_info": {
+        "name": "file_read",
+        "display_name": "æä»¶è¯»å",
+        "category": "æ°æ®å¤ç",
+        "description": "è¯»åæ¬å°æä»¶åå®¹ï¼æ¯æ text/json æ ¼å¼",
+        "params_schema": {
+          "path": "/input/data.json",
+          "format": "text"
+        },
+        "required": [
+          "path"
+        ],
+        "icon": "ð",
+        "color": "#f59e0b",
+        "output_schema": {
+          "content": "any",
+          "size": "int",
+          "path": "str"
+        }
+      }
+    },
+    {
+      "id": "step_2",
+      "name": "ææåç±»",
+      "description": "å¯¹è¯è®ºåå®¹è¿è¡ææåæåç±»ï¼æ­£é¢/è´é¢/ä¸­æ§ï¼",
+      "tool": "llm_classify",
+      "params": {
+        "text": "{{step_1.content}}",
+        "categories": "æ­£é¢,è´é¢,ä¸­æ§",
+        "task": "sentiment"
+      },
+      "tool_info": {
+        "name": "llm_classify",
+        "display_name": "LLM åç±»",
+        "category": "AI å¤ç",
+        "description": "è°ç¨å¤§è¯­è¨æ¨¡åè¿è¡ææ¬åç±»ãææåæãæå¾è¯å«",
+        "params_schema": {
+          "text": "å¾åç±»ææ¬(å¯ç¨ {{step_id.field}} å¼ç¨ä¸ä¸æ­¥è¾åº)",
+          "categories": "ç±»å«åè¡¨,éå·åé(å¯é,ç¼ºçæ task ç»é»è®¤ç±»)",
+          "task": "sentiment"
+        },
+        "required": [
+          "text"
+        ],
+        "icon": "ð§ ",
+        "color": "#a78bfa",
+        "output_schema": {
+          "category": "str",
+          "confidence": "float",
+          "all_scores": "dict",
+          "reason": "str"
+        }
+      }
+    },
+    {
+      "id": "step_3",
+      "name": "æ¡ä»¶åæ¯å¤æ­",
+      "description": "æ ¹æ®ææåç±»ç»æå¤æ­æ¯æ­£é¢è¿æ¯è´é¢è¯è®º",
+      "tool": "if_else",
+      "params": {
+        "field": "{{step_2.category}}",
+        "operator": "eq",
+        "value": "æ­£é¢"
+      },
+      "tool_info": {
+        "name": "if_else",
+        "display_name": "æ¡ä»¶åæ¯",
+        "category": "é»è¾æ§å¶",
+        "description": "æ ¹æ®æ¡ä»¶å¤æ­éæ©æ§è¡è·¯å¾ï¼edges éæ è®° condition ä¸º true æ false",
+        "params_schema": {
+          "field": "è¦å¤æ­çå­æ®µå¼ï¼å¯ç¨ {{step_id.field}} å¼ç¨ä¸ä¸æ­¥è¾åºï¼",
+          "operator": "eq/ne/gt/ge/lt/le/is_empty/is_not_empty/is_null/is_not_null/contain/not_contain/len_gt/len_ge/len_lt/len_le/startwith/endwith",
+          "value": "æ¯è¾çç®æ å¼"
+        },
+        "required": [
+          "field",
+          "operator"
+        ],
+        "icon": "ð",
+        "color": "#fbbf24",
+        "output_schema": {
+          "result": "bool",
+          "branch": "str"
+        }
+      }
+    },
+    {
+      "id": "step_4",
+      "name": "å½æ¡£æ­£é¢è¯è®º",
+      "description": "å°æ­£é¢è¯è®ºåå¥å½æ¡£æä»¶",
+      "tool": "file_write",
+      "params": {
+        "path": "output/positive_reviews.json",
+        "content": "{{step_1.content}}",
+        "format": "json"
+      },
+      "tool_info": {
+        "name": "file_write",
+        "display_name": "æä»¶åå¥",
+        "category": "è¾åºæ¨é",
+        "description": "å°ç»æåå¥æä»¶ï¼æ¬å°æå¯¹è±¡å­å¨ï¼",
+        "params_schema": {
+          "path": "/output/result.json",
+          "format": "json",
+          "content": "åå¥åå®¹ï¼å¯ç¨ {{step_id.field}} å¼ç¨ï¼"
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "icon": "ð¾",
+        "color": "#ef4444",
+        "output_schema": {
+          "success": "bool",
+          "path": "str",
+          "size": "int"
+        }
+      }
+    },
+    {
+      "id": "step_5",
+      "name": "åå¥è´é¢åè­¦",
+      "description": "å°è´é¢è¯è®ºåå¥åè­¦æä»¶ä»¥ä¾¿åç»­å¤ç",
+      "tool": "file_write",
+      "params": {
+        "path": "output/negative_alerts.json",
+        "content": "{{step_1.content}}",
+        "format": "json"
+      },
+      "tool_info": {
+        "name": "file_write",
+        "display_name": "æä»¶åå¥",
+        "category": "è¾åºæ¨é",
+        "description": "å°ç»æåå¥æä»¶ï¼æ¬å°æå¯¹è±¡å­å¨ï¼",
+        "params_schema": {
+          "path": "/output/result.json",
+          "format": "json",
+          "content": "åå¥åå®¹ï¼å¯ç¨ {{step_id.field}} å¼ç¨ï¼"
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "icon": "ð¾",
+        "color": "#ef4444",
+        "output_schema": {
+          "success": "bool",
+          "path": "str",
+          "size": "int"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "step_1",
+      "to": "step_2"
+    },
+    {
+      "from": "step_2",
+      "to": "step_3"
+    },
+    {
+      "from": "step_3",
+      "to": "step_4",
+      "condition": "true"
+    },
+    {
+      "from": "step_3",
+      "to": "step_5",
+      "condition": "false"
+    }
+  ],
+  "on_failure": "continue"
+}

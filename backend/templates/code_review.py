@@ -1,7 +1,6 @@
 """场景3：代码提交后 Code Review
-工作流：Webhook 触发 → GitHub API 获取提交 → LLM Code Review → Slack 推送问题
+工作流：Webhook 触发 → HTTP 请求获取提交 diff → LLM Code Review → Slack 推送
 """
-from core.tool_registry import get_tool
 
 
 def get_template() -> dict:
@@ -23,12 +22,12 @@ def get_template() -> dict:
             {
                 "id": "step_2",
                 "name": "获取提交内容",
-                "description": "通过 GitHub API 获取本次提交的 diff",
-                "tool": "github_api",
+                "description": "通过 GitHub API 获取本次提交的 diff（{owner}/{repo}/{sha} 为占位符，使用前请替换为实际仓库与提交 SHA，或改用 github_api 工具自动填充 owner/repo）",
+                "tool": "http_request",
                 "params": {
-                    "endpoint": "/repos/{owner}/{repo}/commits/{sha}",
-                    "owner": "your-org",
-                    "repo": "your-repo",
+                    "url": "https://api.github.com/repos/{owner}/{repo}/commits/{sha}",
+                    "method": "GET",
+                    "headers": {"Accept": "application/vnd.github.v3.diff"},
                 },
             },
             {
@@ -37,7 +36,7 @@ def get_template() -> dict:
                 "description": "用 LLM 对代码进行 Review",
                 "tool": "llm_review",
                 "params": {
-                    "model": "deepseek-chat",
+                    "code": "{{step_2.body}}",
                     "focus": ["bug", "security", "performance", "style"],
                 },
             },
@@ -47,8 +46,7 @@ def get_template() -> dict:
                 "description": "把 Review 发现的问题推送到 Slack",
                 "tool": "send_slack",
                 "params": {
-                    "webhook_url": "https://hooks.slack.com/services/xxx",
-                    "channel": "#code-review",
+                    "text": "{{step_3.review}}",
                 },
             },
         ],

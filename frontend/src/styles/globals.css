@@ -1,0 +1,728 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   FlowGenie 视觉系统 v3 - Linear/Vercel 启发
+   纯黑底 + 紫色强调 + Geist 字体 + glassmorphism
+   ============================================================ */
+
+@layer base {
+  /* 暗色主题（默认）- 纯黑 + Linear 紫 */
+  :root {
+    /* 背景四级灰阶：#0f0f10 / #1c1c1e / #262629 / #333338 */
+    --background: 240 6% 6%;             /* #0f0f10 中性深灰(非纯黑) */
+    --foreground: 0 0% 98%;             /* #fafafa 主文字 */
+
+    --card: 240 5% 15%;                  /* #262629 卡片 */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 5% 17%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Linear 紫 #5e6ad2 → HSL(230, 84%, 60%) */
+    --primary: 230 84% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    /* 次级背景 #1c1c1e */
+    --secondary: 240 5% 11%;             /* #1c1c1e */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 5% 11%;
+    --muted-foreground: 240 5% 72%;     /* 提升次级文字亮度 */
+
+    --accent: 240 5% 20%;                /* #333338 hover反馈更明显 */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;           /* #ef4444 */
+    --destructive-foreground: 0 0% 98%;
+
+    /* 状态色 */
+    --success: 160 84% 39%;             /* #10b981 */
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;              /* #f59e0b */
+    --warning-foreground: 0 0% 0%;
+    --info: 217 91% 60%;                /* #3b82f6 */
+    --info-foreground: 0 0% 100%;
+
+    /* 边框：纯色 22% 亮度 */
+    --border: 240 5% 22%;
+    --input: 240 5% 22%;
+    --ring: 230 84% 60%;                /* focus 环用紫色 */
+
+    --radius: 0.5rem;
+
+    /* glassmorphism 专用 token */
+    --glass-bg: 0 0% 100% / 0.02;       /* bg-white/[0.02] */
+    --glass-border: 0 0% 100% / 0.08;   /* border-white/[0.08] */
+    --glass-highlight: 0 0% 100% / 0.2; /* 顶部高光 */
+  }
+
+  /* 亮色主题 - 白底 + 黑字 + 紫强调 */
+  .light {
+    --background: 0 0% 98%;             /* #fafafa */
+    --foreground: 240 10% 9%;           /* #18181b */
+
+    --card: 0 0% 100%;                  /* #ffffff */
+    --card-foreground: 240 10% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 9%;
+
+    --primary: 230 84% 60%;             /* 同暗色紫色 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 96%;            /* #f4f4f5 */
+    --secondary-foreground: 240 10% 9%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;     /* #71717a */
+
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 240 6% 10%;
+    --input: 240 6% 10%;
+    --ring: 230 84% 60%;
+
+    --glass-bg: 0 0% 100% / 0.6;
+    --glass-border: 240 6% 10% / 0.1;
+    --glass-highlight: 0 0% 100% / 0.8;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  /* 全局 focus ring 统一：所有 :focus-visible 元素显示紫色 50% ring + 2px offset */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/50 ring-offset-2 ring-offset-background;
+  }
+  html {
+    font-family: 'Geist', 'Noto Sans SC', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color .2s ease, color .2s ease;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+
+  /* grain 噪点纹理 - 全局背景叠加 SVG noise 增加质感 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* 文字选中颜色 */
+  ::selection {
+    background-color: hsl(var(--primary) / 0.3);
+    color: inherit;
+  }
+
+  /* 极简滚动条 - 4px 透明 hover 显示 */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 9999px;
+    transition: background 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground) / 0.2);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  *:hover {
+    scrollbar-color: hsl(var(--foreground) / 0.2) transparent;
+  }
+}
+
+@layer components {
+  /* glassmorphism 工具类：bg/border 跟随主题自动切换
+     暗色：微透明白底 + 微透明白边；亮色：半透明白底 + 深色边 */
+  .glass {
+    background-color: hsl(var(--glass-bg));
+    border-color: hsl(var(--glass-border));
+  }
+
+  /* 全局交互元素过渡工具类 */
+  .interactive {
+    transition: all .15s ease;
+  }
+
+  /* ============================================================
+     ReactFlow 画布与自定义节点样式
+     从旧 global.css 迁移，颜色统一为 hsl(var(--xxx)) token
+     ============================================================ */
+
+  .canvas-wrapper {
+    width: 100%;
+    height: 100%;
+    background: hsl(var(--background));
+  }
+
+  .canvas-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* ReactFlow 自定义节点 */
+  .step-node {
+    position: relative;
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    width: 220px;
+    overflow: visible;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  /* 节点左侧 4px 色条：颜色随节点类型/状态变化 */
+  .step-node::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: hsl(var(--primary));
+    border-radius: 0.5rem 0 0 0.5rem;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* 按节点类型区分色条 */
+  .step-node[data-tool="if_else"]::before {
+    background: hsl(var(--primary));
+  }
+  .step-node[data-tool="loop"]::before {
+    background: hsl(var(--warning));
+  }
+
+  /* 按执行状态区分色条（优先级高于类型） */
+  .step-node[data-status="running"]::before {
+    background: hsl(var(--primary));
+  }
+  .step-node[data-status="success"]::before {
+    background: hsl(var(--success));
+  }
+  .step-node[data-status="failed"]::before {
+    background: hsl(var(--destructive));
+  }
+  .step-node[data-status="skipped"]::before {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* 节点 header：半透明渐变背景 */
+  .step-node-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.16));
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    font-size: 0.8125rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  .step-node-icon {
+    font-size: 1.0625rem;
+  }
+
+  .step-node-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step-node-body {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .step-node-tool {
+    font-size: 0.6875rem;
+    color: hsl(var(--primary));
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .step-node-desc {
+    font-size: 0.6875rem;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.4;
+  }
+
+  /* ReactFlow 控件暗色适配 */
+  .react-flow__controls {
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .react-flow__controls-button {
+    background: hsl(var(--secondary));
+    border-bottom: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+    fill: hsl(var(--foreground));
+  }
+
+  .react-flow__controls-button:hover {
+    background: hsl(var(--card));
+  }
+
+  .react-flow__minimap {
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 6px;
+  }
+
+  /* ===== 节点状态徽章（header 右侧） ===== */
+  .step-node-status-badge {
+    margin-left: auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(var(--primary-foreground));
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  /* running 旋转 spinner */
+  .badge-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid hsl(var(--foreground) / 0.4);
+    border-top-color: hsl(var(--foreground));
+    border-radius: 9999px;
+    display: inline-block;
+    animation: badge-spin 0.8s linear infinite;
+  }
+
+  /* lucide 图标通用旋转动画（用于 Loader 等待态） */
+  .icon-spin {
+    animation: badge-spin 0.8s linear infinite;
+  }
+
+  /* ===== 节点序号徽章（左上角） ===== */
+  .step-node-number {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-size: 0.6875rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+    border: 2px solid hsl(var(--secondary));
+  }
+
+  /* ===== if_else 分支节点 ===== */
+  .step-node-ifelse-label {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.6875rem;
+    color: hsl(var(--primary));
+    background: hsl(var(--primary) / 0.12);
+    border-bottom: 1px solid hsl(var(--border));
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  .step-node-ifelse .step-node-header {
+    border-radius: 0;
+  }
+
+  /* ===== loop 节点循环提示 ===== */
+  .step-node-loop-hint {
+    margin-top: 0.4rem;
+    padding: 0.2rem 0.5rem;
+    background: hsl(var(--warning) / 0.15);
+    border: 1px solid hsl(var(--warning) / 0.3);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    color: hsl(var(--warning));
+    font-weight: 600;
+  }
+
+  /* ===== 节点删除按钮 ===== */
+  .step-node-delete {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: hsl(var(--destructive) / 0.9);
+    color: hsl(var(--destructive-foreground));
+    border: 1px solid hsl(var(--foreground) / 0.3);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    line-height: 1;
+    z-index: 10;
+    padding: 0;
+    font-family: inherit;
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .react-flow__node:hover .step-node-delete {
+    display: flex;
+  }
+
+  .step-node-delete:hover {
+    background: hsl(var(--destructive));
+    transform: scale(1.15);
+  }
+
+  /* ===== 自定义边：条件标签与删除按钮 ===== */
+  .edge-label-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .edge-condition-label {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    color: hsl(var(--foreground));
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .edge-condition-true {
+    background: hsl(var(--success) / 0.9);
+  }
+
+  .edge-condition-false {
+    background: hsl(var(--destructive) / 0.9);
+  }
+
+  .edge-condition-label:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .edge-condition-label::after {
+    content: "点击切换";
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: hsl(var(--muted-foreground));
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+
+  .edge-condition-label:hover::after {
+    opacity: 1;
+  }
+
+  .edge-condition-exception {
+    background: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+    border: 1px solid hsl(var(--warning));
+  }
+
+  .edge-delete-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+    border: 1px solid hsl(var(--foreground) / 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    line-height: 1;
+    padding: 0;
+    font-family: inherit;
+    transition: transform 0.15s;
+  }
+
+  .edge-delete-btn:hover {
+    transform: scale(1.15);
+  }
+
+  /* ===== 节点状态动画 ===== */
+  .step-node[data-status="running"] {
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7);
+  }
+
+  .step-node[data-status="failed"] {
+    border-color: hsl(var(--destructive)) !important;
+    box-shadow: 0 0 12px hsl(var(--destructive) / 0.4);
+  }
+
+  .step-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  /* ReactFlow 节点 hover 反馈：轻微放大 + 紫色边框 + 提层 */
+  .react-flow__node:hover {
+    transform: scale(1.02);
+    border-color: hsl(var(--primary) / 0.4);
+    transition: transform .15s ease, border-color .15s ease;
+    z-index: 10;
+  }
+
+  /* ============================================================
+     Dashboard 图表样式（柱状图 / 工具条 / tooltip）
+     从旧 global.css 迁移，颜色统一为 hsl(var(--xxx)) token
+     ============================================================ */
+
+  /* 7 天趋势柱状图 */
+  .dashboard-trend-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    height: 140px;
+    padding: 0.5rem 0.2rem;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 27px,
+      hsl(var(--border)) 27px,
+      hsl(var(--border)) 28px
+    );
+  }
+
+  /* 趋势柱图 wrap 需要相对定位以承载 tooltip */
+  .dashboard-trend-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    height: 100%;
+    min-width: 0;
+    position: relative;
+  }
+
+  .dashboard-trend-bar-container {
+    width: 70%;
+    max-width: 36px;
+    min-height: 4px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+    margin-top: auto;
+  }
+
+  .dashboard-trend-bar-success {
+    background: hsl(var(--success));
+    width: 100%;
+  }
+
+  .dashboard-trend-bar-failed {
+    background: hsl(var(--destructive));
+    width: 100%;
+  }
+
+  /* hover tooltip */
+  .dashboard-trend-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0.5rem;
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.6875rem;
+    color: hsl(var(--foreground));
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    min-width: 120px;
+  }
+
+  /* 工具使用频率横向条形图 */
+  .dashboard-tool-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.5));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  /* 柱状图生长动画（scaleY 0→1） */
+  .dashboard-bar {
+    transform-origin: bottom;
+    animation: bar-grow 0.4s ease-out backwards;
+  }
+
+  /* 覆盖 .dashboard-tool-bar-fill 原有的 width transition，改用 keyframes 生长 */
+  .dashboard-tool-bar.dashboard-tool-bar-fill {
+    width: 0;
+    animation: bar-width-grow 0.5s ease-out both;
+    transition: none;
+  }
+
+  /* ============================================================
+     Toast 进度条与 RunPanel 不定态进度条
+     ============================================================ */
+
+  /* Toast 底部倒计时进度条：scaleX 从 1 缩到 0，duration 由内联 style 设置 */
+  .toast-progress {
+    transform-origin: left;
+    animation-name: toast-progress-shrink;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+
+  /* RunPanel indeterminate 进度条：1/3 宽色块左右滑动 */
+  .progress-indeterminate {
+    animation: progress-indeterminate 1.2s ease-in-out infinite;
+  }
+}
+
+/* ============================================================
+   Keyframes 动画定义
+   ============================================================ */
+
+@keyframes badge-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px hsl(var(--primary) / 0), 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes node-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes step-running-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.7); }
+  70% { box-shadow: 0 0 0 10px hsl(var(--primary) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes bar-width-grow {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--target-width);
+  }
+}
+
+/* Toast 进度条收缩动画（scaleX 1→0） */
+@keyframes toast-progress-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* RunPanel indeterminate 进度条滑动动画 */
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+/* ============================================================
+   全局微交互与无障碍
+   ============================================================ */
+
+/* 尊重用户系统级"减少动画"偏好：所有动画/过渡几乎瞬时完成 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

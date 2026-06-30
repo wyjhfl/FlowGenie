@@ -1,0 +1,168 @@
+{
+  "steps": [
+    {
+      "id": "step_1",
+      "name": "è¯»åæ°æ®æä»¶",
+      "description": "è¯»ååå«è®°å½åè¡¨çæ°æ®æä»¶",
+      "tool": "file_read",
+      "params": {
+        "path": "inputs/records.json",
+        "format": "json"
+      },
+      "tool_info": {
+        "name": "file_read",
+        "display_name": "æä»¶è¯»å",
+        "category": "æ°æ®å¤ç",
+        "description": "è¯»åæ¬å°æä»¶åå®¹ï¼æ¯æ text/json æ ¼å¼",
+        "params_schema": {
+          "path": "/input/data.json",
+          "format": "text"
+        },
+        "required": [
+          "path"
+        ],
+        "icon": "ð",
+        "color": "#f59e0b",
+        "output_schema": {
+          "content": "any",
+          "size": "int",
+          "path": "str"
+        }
+      }
+    },
+    {
+      "id": "step_2",
+      "name": "å¾ªç¯çææè¦",
+      "description": "éåæ¯æ¡è®°å½å¹¶çææè¦",
+      "tool": "loop",
+      "params": {
+        "input_array": "{{step_1.content}}",
+        "sub_steps": [
+          {
+            "id": "sub_1",
+            "name": "çæåæ¡æè¦",
+            "tool": "llm_summary",
+            "params": {
+              "text": "{{item}}",
+              "max_length": 200,
+              "language": "zh"
+            }
+          }
+        ],
+        "sub_edges": [
+          {
+            "from": "sub_1",
+            "to": "end"
+          }
+        ]
+      },
+      "tool_info": {
+        "name": "loop",
+        "display_name": "å¾ªç¯éå",
+        "category": "é»è¾æ§å¶",
+        "description": "å¯¹æ°ç»ç±»åçæ°æ®éåæ§è¡å­æµç¨ï¼å­æµç¨æ­¥éª¤å®ä¹å¨ sub_steps ä¸­",
+        "params_schema": {
+          "input_array": "è¦éåçæ°ç»ï¼å¯ç¨ {{step_id.field}} å¼ç¨ä¸ä¸æ­¥è¾åºçæ°ç»ï¼",
+          "sub_steps": [
+            {
+              "id": "sub_1",
+              "name": "å¤çåé¡¹",
+              "tool": "llm_summary",
+              "params": {
+                "text": "{{item}}"
+              }
+            }
+          ],
+          "sub_edges": []
+        },
+        "required": [
+          "input_array",
+          "sub_steps"
+        ],
+        "icon": "ð",
+        "color": "#fbbf24",
+        "output_schema": {
+          "results": "list",
+          "count": "int"
+        }
+      }
+    },
+    {
+      "id": "step_3",
+      "name": "å»¶æ¶ç­å¾",
+      "description": "ç­å¾ä¸æ®µæ¶é´ä»¥ä¾¿å¤çå®æ",
+      "tool": "wait_delay",
+      "params": {
+        "duration": 2,
+        "unit": "seconds"
+      },
+      "tool_info": {
+        "name": "wait_delay",
+        "display_name": "å»¶æ¶ç­å¾",
+        "category": "é»è¾æ§å¶",
+        "description": "æåå·¥ä½æµæ§è¡æå®æ¶é¿(seconds/minutes/hours)",
+        "params_schema": {
+          "duration": 10,
+          "unit": "seconds"
+        },
+        "required": [
+          "duration"
+        ],
+        "icon": "â³",
+        "color": "#fbbf24",
+        "output_schema": {
+          "waited_seconds": "int",
+          "message": "str"
+        }
+      }
+    },
+    {
+      "id": "step_4",
+      "name": "åå¥æ±æ»ç»æ",
+      "description": "å°çæçæè¦æ±æ»åå¥æä»¶",
+      "tool": "file_write",
+      "params": {
+        "path": "output/summaries.json",
+        "format": "json",
+        "content": "{{step_2.results}}"
+      },
+      "tool_info": {
+        "name": "file_write",
+        "display_name": "æä»¶åå¥",
+        "category": "è¾åºæ¨é",
+        "description": "å°ç»æåå¥æä»¶ï¼æ¬å°æå¯¹è±¡å­å¨ï¼",
+        "params_schema": {
+          "path": "/output/result.json",
+          "format": "json",
+          "content": "åå¥åå®¹ï¼å¯ç¨ {{step_id.field}} å¼ç¨ï¼"
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "icon": "ð¾",
+        "color": "#ef4444",
+        "output_schema": {
+          "success": "bool",
+          "path": "str",
+          "size": "int"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "step_1",
+      "to": "step_2"
+    },
+    {
+      "from": "step_2",
+      "to": "step_3"
+    },
+    {
+      "from": "step_3",
+      "to": "step_4"
+    }
+  ],
+  "on_failure": "continue"
+}

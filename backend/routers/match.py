@@ -36,8 +36,8 @@ async def match_tools(req: MatchRequest):
     edges = []
     for i in range(len(enriched_steps) - 1):
         edges.append({
-            "from": enriched_steps[i]["id"],
-            "to": enriched_steps[i + 1]["id"],
+            "from": enriched_steps[i].get("id"),
+            "to": enriched_steps[i + 1].get("id"),
         })
 
     return MatchResponse(

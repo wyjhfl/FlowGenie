@@ -18,8 +18,8 @@ def export_to_json(workflow: dict) -> str:
     for step in workflow.get("steps", []):
         tool = get_tool(step.get("tool", ""))
         step_data = {
-            "id": step["id"],
-            "name": step["name"],
+            "id": step.get("id", ""),
+            "name": step.get("name", ""),
             "description": step.get("description", ""),
             "tool": step.get("tool", ""),
             "tool_info": tool.to_dict() if tool else None,

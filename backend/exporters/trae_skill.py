@@ -20,8 +20,8 @@ def export_to_trae_skill(workflow: dict) -> str:
     for step in workflow.get("steps", []):
         tool = get_tool(step.get("tool", ""))
         step_def = {
-            "id": step["id"],
-            "name": step["name"],
+            "id": step.get("id", ""),
+            "name": step.get("name", ""),
             "description": step.get("description", ""),
             "tool": step.get("tool", ""),
             "tool_display_name": tool.display_name if tool else step.get("tool", ""),
@@ -47,22 +47,25 @@ def export_to_trae_skill_yaml(workflow: dict) -> str:
     ]
     for step in workflow.get("steps", []):
         tool = get_tool(step.get("tool", ""))
-        lines.append(f"  - id: {step['id']}")
-        lines.append(f"    name: {step['name']}")
+        lines.append(f"  - id: {step.get('id', '')}")
+        lines.append(f"    name: {step.get('name', '')}")
         lines.append(f"    tool: {step.get('tool', '')}")
         lines.append(f"    description: {step.get('description', '')}")
         params = step.get("params", {})
         if params:
             lines.append(f"    params:")
             for k, v in params.items():
-                lines.append(f"      {k}: {v}")
+                if isinstance(v, (dict, list)):
+                    lines.append(f"      {k}: {json.dumps(v, ensure_ascii=False)}")
+                else:
+                    lines.append(f"      {k}: {v}")
         else:
             lines.append(f"    params: {{}}")
 
     lines.append(f"")
     lines.append(f"edges:")
     for edge in workflow.get("edges", []):
-        lines.append(f"  - from: {edge['from']}")
-        lines.append(f"    to: {edge['to']}")
+        lines.append(f"  - from: {edge.get('from', '')}")
+        lines.append(f"    to: {edge.get('to', '')}")
 
     return "\n".join(lines)

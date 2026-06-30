@@ -1,1 +1,43 @@
-"""templates 包初始化"""
+"""templates 包初始化 - 场景模板注册"""
+from . import (
+    news_summary,
+    sales_report,
+    code_review,
+    rss_summary,
+    github_monitor,
+    telegram_push,
+    web_monitor,
+    data_analysis,
+    contract_review,
+    sales_quote,
+    daily_news_briefing,
+    social_media_monitor,
+    meeting_minutes,
+    lead_scoring,
+    content_localization,
+    stock_alert,
+    agent_research,
+    rag_qa,
+)
+
+# 已注册的场景模板列表（每个模板调用 get_template() 返回完整工作流 dict）
+TEMPLATES: list[dict] = [
+    news_summary.get_template(),
+    sales_report.get_template(),
+    code_review.get_template(),
+    rss_summary.get_template(),
+    github_monitor.get_template(),
+    telegram_push.get_template(),
+    web_monitor.get_template(),
+    data_analysis.get_template(),
+    contract_review.get_template(),
+    sales_quote.get_template(),
+    daily_news_briefing.get_template(),
+    social_media_monitor.get_template(),
+    meeting_minutes.get_template(),
+    lead_scoring.get_template(),
+    content_localization.get_template(),
+    stock_alert.get_template(),
+    agent_research.get_template(),
+    rag_qa.get_template(),
+]
