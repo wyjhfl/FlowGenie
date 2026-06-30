@@ -150,7 +150,8 @@ export function DashboardView({
   }, [workflows])
 
   const hasWorkflows = workflows.length > 0
-  const weekTotal = stats ? stats.trend.reduce((sum, t) => sum + t.total, 0) : 0
+  // 防御性判空:stats.trend 可能在某些边缘情况下为 undefined(如后端返回不完整)
+  const weekTotal = stats && Array.isArray(stats.trend) ? stats.trend.reduce((sum, t) => sum + (t?.total || 0), 0) : 0
   const popularTemplates = SCENARIO_TEMPLATES.slice(0, 4)
 
   return (
@@ -285,7 +286,7 @@ export function DashboardView({
                         <Zap size={16} className="text-warning" />
                       </div>
                       <div className="text-3xl font-bold text-warning">{weekTotal}</div>
-                      {stats.trend.length > 0 && (
+                      {stats?.trend && stats.trend.length > 0 && (
                         <svg
                           viewBox="0 0 120 28"
                           preserveAspectRatio="none"
@@ -298,7 +299,7 @@ export function DashboardView({
                             strokeWidth="1.5"
                             strokeLinejoin="round"
                             strokeLinecap="round"
-                            points={buildSparkline(stats.trend.map((t) => t.total))}
+                            points={buildSparkline(stats.trend.map((t) => t?.total || 0))}
                           />
                         </svg>
                       )}
