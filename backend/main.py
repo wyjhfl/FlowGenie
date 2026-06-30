@@ -43,6 +43,8 @@ _origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://flowgenie.vercel.app",
+    "https://flow-genie-eight.vercel.app",  # Vercel 实际部署地址
+    "https://flowgenie.hfl.asia",  # 自有域名(绑定后生效)
 ]
 _frontend_url = os.getenv("FRONTEND_URL", "")
 if _frontend_url and _frontend_url not in _origins:
