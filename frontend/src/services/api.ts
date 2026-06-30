@@ -10,7 +10,8 @@ import type {
 } from '../types/workflow'
 
 // 根据环境变量决定 API 基础地址
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+// Vercel 部署:优先读环境变量;若环境变量未注入(构建缓存/配置错误),回退到生产后端地址
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://flowgenie-w8xb.onrender.com'
 
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,

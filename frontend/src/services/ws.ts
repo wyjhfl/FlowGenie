@@ -14,11 +14,14 @@ class WSClient {
   private manuallyClosed = false
 
   constructor() {
-    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    // Vercel 部署:WebSocket 需直连后端(Render),不能用 window.location.host
+    // 优先读环境变量;若未注入,回退到生产后端地址
+    const backendHost = import.meta.env.VITE_API_BASE_URL || 'https://flowgenie-w8xb.onrender.com'
+    const wsBaseUrl = backendHost.replace(/^http/, 'ws')
     // api_key 可选:生产环境配置了 FLOWGENIE_API_KEY 时需鉴权
     const apiKey = localStorage.getItem('flowgenie-api-key') || ''
     const query = apiKey ? `?api_key=${encodeURIComponent(apiKey)}` : ''
-    this.url = `${proto}//${window.location.host}/ws${query}`
+    this.url = `${wsBaseUrl}/ws${query}`
   }
 
   /** 建立 WS 连接(已连接/连接中时跳过) */

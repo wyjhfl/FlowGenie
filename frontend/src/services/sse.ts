@@ -2,7 +2,7 @@
 // API_BASE_URL 本地重新派生,避免与 api.ts 形成循环依赖
 import type { ParseResponse } from '../types/workflow'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://flowgenie-w8xb.onrender.com'
 
 /** 流式执行工作流（SSE）
  *  返回 AbortController 供调用方中止流；超时与外部中止均通过 controller.abort() 触发。
