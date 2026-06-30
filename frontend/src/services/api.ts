@@ -26,7 +26,8 @@ export async function parseRequirement(
 ): Promise<ParseResponse> {
   const body: Record<string, unknown> = { requirement }
   if (useTemplate !== undefined) body.use_template = useTemplate
-  const { data } = await api.post<ParseResponse>('/parse', body)
+  // Vercel 部署:LLM 调用 + Render Free 冷启动可能 60s+,放宽到 120s
+  const { data } = await api.post<ParseResponse>('/parse', body, { timeout: 120000 })
   return data
 }
 
@@ -38,7 +39,7 @@ export async function refineWorkflow(
   const { data } = await api.post<ParseResponse>('/parse/refine', {
     current_workflow: currentWorkflow,
     instruction,
-  })
+  }, { timeout: 120000 })
   return data
 }
 
