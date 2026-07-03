@@ -24,7 +24,12 @@ export function runWorkflowStream(
 ): AbortController {
   const controller = new AbortController()
   // 5 分钟超时，长耗时工作流；超时后中止流
-  const timeoutId = setTimeout(() => controller.abort(), 300000)
+  // 用 timedOut 标志区分"超时 abort"和"用户主动 abort"：超时需通知调用方重置 running 状态
+  let timedOut = false
+  const timeoutId = setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, 300000)
 
   const body: Record<string, unknown> = {
     steps: workflow.steps,
@@ -50,8 +55,10 @@ export function runWorkflowStream(
       })
     } catch (err) {
       clearTimeout(timeoutId)
-      // 主动中止时不触发 onError
-      if (!controller.signal.aborted) {
+      // 用户主动中止时不触发 onError;超时中止需通知调用方重置 running 状态
+      if (timedOut) {
+        onError('执行超时(5 分钟),已自动中止')
+      } else if (!controller.signal.aborted) {
         onError(err instanceof Error ? err.message : '请求流式执行失败')
       }
       return
@@ -172,8 +179,10 @@ export function runWorkflowStream(
         onError('流式执行连接已关闭，未收到完成事件')
       }
     } catch (err) {
-      // 主动中止时不触发 onError
-      if (!controller.signal.aborted && !terminated) {
+      // 用户主动中止时不触发 onError;超时中止需通知调用方重置 running 状态
+      if (timedOut) {
+        onError('执行超时(5 分钟),已自动中止')
+      } else if (!controller.signal.aborted && !terminated) {
         onError(err instanceof Error ? err.message : '读取流式响应失败')
       }
     } finally {
